@@ -1,0 +1,11 @@
+package com.jsstudio.android;
+import android.app.*;import android.os.*;import android.webkit.*;import android.widget.*;import android.graphics.Color;import android.view.*;import android.media.AudioManager;import android.content.Context;
+public class MainActivity extends Activity {
+ WebView web; FrameLayout root; View full; WebChromeClient.CustomViewCallback cb;
+ public void onCreate(Bundle b){super.onCreate(b);setVolumeControlStream(AudioManager.STREAM_MUSIC);root=new FrameLayout(this);LinearLayout layout=new LinearLayout(this);layout.setOrientation(1);layout.setBackgroundColor(Color.rgb(8,20,40));root.addView(layout);setContentView(root);
+ LinearLayout bar=new LinearLayout(this);TextView title=new TextView(this);title.setText("  JS Studio  ");title.setTextColor(Color.WHITE);title.setTextSize(20);bar.addView(title);EditText q=new EditText(this);q.setSingleLine();q.setHint("Pesquisar músicas e vídeos");bar.addView(q,new LinearLayout.LayoutParams(0,-2,1));Button search=new Button(this);search.setText("Buscar");bar.addView(search);Button home=new Button(this);home.setText("Início");bar.addView(home);layout.addView(bar);
+ web=new WebView(this);layout.addView(web,new LinearLayout.LayoutParams(-1,0,1));web.getSettings().setJavaScriptEnabled(true);web.getSettings().setDomStorageEnabled(true);web.getSettings().setMediaPlaybackRequiresUserGesture(true);web.setWebViewClient(new WebViewClient());web.setWebChromeClient(new WebChromeClient(){public void onShowCustomView(View v,CustomViewCallback c){full=v;cb=c;layout.setVisibility(View.GONE);root.addView(v,new FrameLayout.LayoutParams(-1,-1));}public void onHideCustomView(){if(full!=null){root.removeView(full);full=null;layout.setVisibility(View.VISIBLE);cb.onCustomViewHidden();}}});
+ search.setOnClickListener(v->web.loadUrl("https://m.youtube.com/results?search_query="+android.net.Uri.encode(q.getText().toString())));home.setOnClickListener(v->web.loadUrl("https://m.youtube.com/"));web.loadUrl("https://m.youtube.com/");}
+ public void onBackPressed(){if(full!=null){web.getWebChromeClient().onHideCustomView();}else if(web.canGoBack())web.goBack();else super.onBackPressed();}
+ protected void onPause(){super.onPause();web.onPause();}protected void onResume(){super.onResume();if(web!=null)web.onResume();}
+}
